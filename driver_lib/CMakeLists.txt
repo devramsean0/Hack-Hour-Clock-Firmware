@@ -3,4 +3,5 @@ target_sources(${PROJ_NAME} PRIVATE
     device_drivers.c
     bme280.c
     mcp4725.c
+    pico_8seg_led.c
 )

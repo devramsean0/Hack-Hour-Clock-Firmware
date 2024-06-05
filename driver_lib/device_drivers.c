@@ -48,6 +48,13 @@ void driver_init(void) {
             uart_puts(UART_ID_CLI, "[FAIL]");
         }
     }
-
+    if (HW_USE_SPI0 && PICO_8SEG_LED_ATTACHED) {
+        uart_puts(UART_ID_CLI, " pico-8seg-led");
+        if (pico_8seg_led_init()) {
+            uart_puts(UART_ID_CLI, "[PASS]");
+        } else {
+            uart_puts(UART_ID_CLI, "[FAIL]");
+        }
+    }
     uart_puts(UART_ID_CLI, " }\r\n");
 }

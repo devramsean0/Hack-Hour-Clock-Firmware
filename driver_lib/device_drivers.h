@@ -26,8 +26,9 @@
 
 // use the below settings to specify which devices are attached to the system
 // set to true to load driver and run init for this peripheral device
-#define BME280_ATTACHED  true
-#define MCP4725_ATTACHED true
+#define BME280_ATTACHED  false
+#define MCP4725_ATTACHED false
+#define PICO_8SEG_LED_ATTACHED    true
 
 /**
 * @brief Initialize all attached peripheral devices.
@@ -165,6 +166,12 @@ int mcp4725_set_voltage(float voltage, bool save_in_eeprom);
 * @return floating-point voltage setting of the DAC (negative indicates error)
 */
 float mcp4725_get_voltage(void);
+
+
+/** Pico-8seg-led **/
+int pico_8seg_led_init(void);
+void pico_8seg_led_send_command(uint8_t command);
+void pico_8seg_led_send_data(uint8_t address, uint8_t data);
 
 
 #endif /* DEVICE_DRIVERS_H */

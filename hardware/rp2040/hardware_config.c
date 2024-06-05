@@ -17,6 +17,7 @@
 
 #include <string.h>
 #include "hardware_config.h"
+#include "pico/cyw43_arch.h"
 
 
 void hardware_init(void) {
@@ -70,6 +71,10 @@ void hardware_init(void) {
         onboard_led_init();
         uart_puts(UART_ID_CLI, "led ");
     }
+
+    if (cyw43_arch_init()) {
+        printf("Wi-Fi init failed");
+    } 
 
     // initialize the ADC(s)
     if (HW_USE_ADC) {

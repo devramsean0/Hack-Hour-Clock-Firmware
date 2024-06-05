@@ -45,6 +45,7 @@ target_link_libraries(${PROJ_NAME} PUBLIC
     hardware_adc
     cmsis_core
     tinyusb_device
+    pico_cyw43_arch_none
     ${hardware_libs}
 )
 target_include_directories(${PROJ_NAME} PUBLIC

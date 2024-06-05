@@ -492,7 +492,7 @@ int spi0_read_registers(uint8_t cs_pin, uint8_t reg_addr, uint8_t *read_buf, uin
 
 /************************
  * On-board LED
-*************************/
+*********FU****************/
 
 // Enable onboard LED - setting to false will disable (not initialized at boot)
 // note - if using a Pico W board, the onboard LED is connected to the CYW43 radio -
