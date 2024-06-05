@@ -1,66 +1,81 @@
-# Generated CMake Pico project file
-
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.18)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Initialise pico_sdk from installed location
-# (note this can come from environment, CMake cache etc)
-
-# == DO NEVER EDIT THE NEXT LINES for Raspberry Pi Pico VS Code Extension to work ==
-if(WIN32)
-   set(USERHOME $ENV{USERPROFILE})
-else()
-    set(USERHOME $ENV{HOME})
+# Project/hardware-specific setup - set platform in project.cmake
+include(project.cmake)
+set(hardware_dir ${CMAKE_CURRENT_SOURCE_DIR}/hardware/${PLATFORM})
+if(EXISTS ${hardware_dir}/prebuild.cmake)
+    include(${hardware_dir}/prebuild.cmake)
 endif()
-set(PICO_SDK_PATH ${USERHOME}/.pico-sdk/sdk/1.5.1)
-set(PICO_TOOLCHAIN_PATH ${USERHOME}/.pico-sdk/toolchain/13_2_Rel1)
-if(WIN32)
-    set(pico-sdk-tools_DIR ${USERHOME}/.pico-sdk/tools/1.5.1)
-    include(${pico-sdk-tools_DIR}/pico-sdk-tools-config.cmake)
-    include(${pico-sdk-tools_DIR}/pico-sdk-tools-config-version.cmake)
-endif()
-# ====================================================================================
-set(PICO_BOARD pico_w CACHE STRING "Board type")
+project(${PROJ_NAME} C CXX ASM)
 
-# Pull in Raspberry Pi Pico SDK (must be before project)
-include(pico_sdk_import.cmake)
+add_definitions(-DPROJECT_NAME=${PROJ_NAME})   # pass the project name to the preprocessor for use in the code
+add_definitions(-DPROJECT_VERSION=${PROJ_VER}) # pass the project version number to the preprocessor for use in the code
+add_definitions(-DCLI_USE_USB=${CLI_IFACE})    # 0: use UART for CLI (default), 1: use USB for CLI
+add_definitions(-DBOARD=${BOARD})              # pass the board type to the preprocessor for further decision making
+#add_definitions(-DSCHED_TEST_DELAY)           # uncomment to force delay tasks for scheduler testing, see 'task_sched_update()' function
 
-if (PICO_SDK_VERSION_STRING VERSION_LESS "1.4.0")
-  message(FATAL_ERROR "Raspberry Pi Pico SDK version 1.4.0 (or later) required. Your version is ${PICO_SDK_VERSION_STRING}")
-endif()
+# FreeRTOS
+include(${PROJECT_SOURCE_DIR}/FreeRTOS/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.cmake)
 
-project(HackHour C CXX ASM)
+# add cli/microshell library subdirectory (submodule)
+add_subdirectory(${PROJECT_SOURCE_DIR}/cli cli)
 
-# Initialise the Raspberry Pi Pico SDK
-pico_sdk_init()
+# add littlefs library subdirectory (submodule)
+add_subdirectory(${PROJECT_SOURCE_DIR}/littlefs littlefs)
 
-# Add executable. Default name is the project name, version 0.1
+# add git version library subdirectory (submodule)
+add_subdirectory(${PROJECT_SOURCE_DIR}/git_version cmake_git_version_tracking)
 
-add_executable(HackHour HackHour.c)
-
-pico_set_program_name(HackHour "HackHour")
-pico_set_program_version(HackHour "0.1")
-
-# Modify the below lines to enable/disable output over UART/USB
-pico_enable_stdio_uart(HackHour 0)
-pico_enable_stdio_usb(HackHour 0)
-
-# Add the standard library to the build
-target_link_libraries(HackHour
-        pico_stdlib)
-
-# Add the standard include files to the build
-target_include_directories(HackHour PRIVATE
-  ${CMAKE_CURRENT_LIST_DIR}
-  ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
+# create the main executable
+add_executable(${PROJ_NAME}
+    main.c
+)
+target_link_libraries(${PROJ_NAME} PUBLIC
+    FreeRTOS-Kernel
+    FreeRTOS-Kernel-Heap4
+    cli
+    littlefs
+    cmake_git_version_tracking
+    hardware_i2c
+    hardware_spi
+    hardware_flash
+    hardware_adc
+    cmsis_core
+    tinyusb_device
+    ${hardware_libs}
+)
+target_include_directories(${PROJ_NAME} PUBLIC
+    ${PROJECT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/rtos
+    ${PROJECT_SOURCE_DIR}/services
+    ${PROJECT_SOURCE_DIR}/driver_lib
+    ${PROJECT_SOURCE_DIR}/littlefs/littlefs
+    ${PROJECT_SOURCE_DIR}/git_version
+    ${PROJECT_SOURCE_DIR}/${hardware_includes}
 )
 
-# Add any user requested libraries
-target_link_libraries(HackHour 
-        pico_cyw43_arch_none
-        )
+add_subdirectory(${PROJECT_SOURCE_DIR}/rtos)
+add_subdirectory(${PROJECT_SOURCE_DIR}/services)
+add_subdirectory(${PROJECT_SOURCE_DIR}/driver_lib)
+if(DEFINED hardware_dir)
+    add_subdirectory(${hardware_dir})
+endif()
 
-pico_add_extra_outputs(HackHour)
+# add any additional definitions, options
+target_compile_definitions(${PROJ_NAME} PUBLIC 
+    CFG_TUSB_CONFIG_FILE="hardware_config.h" # override standard TinyUSB config file location
+)
+target_compile_options(
+    ${PROJ_NAME}
+    PRIVATE
+    -Werror -g -O0
+)
+# TODO: try to add -Wall and -Wextra to compile options to clean up more warnings
+
+# Any pre-build stuff the hardware module needs, as a function
+if(COMMAND hardware_build_extra)
+    cmake_language(CALL hardware_build_extra)
+endif()
