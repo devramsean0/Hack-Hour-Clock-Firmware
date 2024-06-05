@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "utils.h"
 
 
 /**************************
@@ -170,8 +171,7 @@ float mcp4725_get_voltage(void);
 
 /** Pico-8seg-led **/
 int pico_8seg_led_init(void);
-void pico_8seg_led_send_command(uint8_t command);
-void pico_8seg_led_send_data(uint8_t address, uint8_t data);
-
+void pico_8seg_led_send_command(UBYTE const Num, UBYTE const Seg);
+void GPIO_MODE(UWORD Pin, UWORD Mode);
 
 #endif /* DEVICE_DRIVERS_H */

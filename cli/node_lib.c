@@ -56,13 +56,6 @@ size_t bme280_get_data_callback(struct ush_object *self, struct ush_file_descrip
     // return data size
     return strlen(bme280_data_msg);
 }
-
-size_t pico_8seg_led_get_data_callback(struct ush_object *self, struct ush_file_descriptor const *file, uint8_t **data) {
-
-}
-void pico_8seg_led_set_data_callback(struct ush_object *self, struct ush_file_descriptor const *file, uint8_t *data, size_t size) {
-
-}
 /**
 * @brief '/lib/mcp4725' get data callback function.
 *
@@ -126,8 +119,8 @@ static const struct ush_file_descriptor lib_files[] = {
         .description = "Waveshare Pico 8 8 segment led driver",
         .help = NULL,
         .exec = NULL,
-        .get_data = pico_8seg_led_get_data_callback,
-        .set_data = pico_8seg_led_set_data_callback
+        .get_data = NULL,
+        .set_data = NULL
     }
     #endif
     #if HW_USE_I2C0 && MCP4725_ATTACHED
