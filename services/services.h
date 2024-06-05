@@ -65,6 +65,7 @@
 #define SERVICE_NAME_STORMAN    storagemanager
 #define SERVICE_NAME_WATCHDOG   watchdog
 #define SERVICE_NAME_HEARTBEAT  heartbeat
+#define SERVICE_NAME_WIFI       wifi
 
 // freertos task priorities for the services.
 // as long as configUSE_TIME_SLICING is set, equal priority tasks will share time.
@@ -74,6 +75,7 @@
 #define PRIORITY_STORMAN   3
 #define PRIORITY_WATCHDOG  1
 #define PRIORITY_HEARTBEAT 1
+#define PRIORITY_WIFI      1
 
 // number of sequential time slices to run each service before beginning the
 // delay interval set below. If a service should run most of the time, set REPEAT
@@ -107,6 +109,7 @@
 #define STACK_STORMAN   1024
 #define STACK_WATCHDOG  configMINIMAL_STACK_SIZE // 256 by default
 #define STACK_HEARTBEAT configMINIMAL_STACK_SIZE
+#define STACK_WIFI      configMINIMAL_STACK_SIZE
 
 
 /************************
@@ -201,6 +204,7 @@ BaseType_t watchdog_service(void);
 */
 BaseType_t heartbeat_service(void);
 
+BaseType_t wifi_service(void);
 
 /************************
  * Service Arrays
@@ -216,7 +220,8 @@ static const ServiceFunc_t service_functions[] = {
     usb_service,
     storman_service,
     watchdog_service,
-    heartbeat_service
+    heartbeat_service,
+    wifi_service
 };
 
 // string versions of service names, used when comparing against user input.
@@ -229,7 +234,8 @@ static const char *service_strings[] = {
     xstr(SERVICE_NAME_USB),
     xstr(SERVICE_NAME_STORMAN),
     xstr(SERVICE_NAME_WATCHDOG),
-    xstr(SERVICE_NAME_HEARTBEAT)
+    xstr(SERVICE_NAME_HEARTBEAT),
+    xstr(SERVICE_NAME_WIFI)
 };
 
 // startup services - launched automatically by taskmanager at boot.
@@ -240,6 +246,7 @@ static const char *startup_services[] = {
     "cli",
     "storagemanager",
     "watchdog"
+    "wifi"
 };
 
 
