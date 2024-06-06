@@ -25,6 +25,7 @@
 #include "task.h"
 #include "queue.h"
 #include "device_drivers.h"
+#include "pico/cyw43_arch.h"
 
 #define KILOBIT   0XFE //KiloBit
 #define HUNDREDS  0XFD //hundreds
@@ -89,10 +90,8 @@ static void prvSegmentTask(void *pvParameters)
     // Service startup (run once) code can be placed here
     // (similar to Arduino setup(), if that's your thing)
     //
-    static char *segment_string = "ba-bump";
-    printf("Before Logs");
     if (pico_8seg_led_init()) {
-        cli_print_timestamped("Initialized");
+        cli_print_timestamped("Initialized 8-segment LED display");
     };
     while(true) {
         //

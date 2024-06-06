@@ -368,7 +368,7 @@ int aux_uart_read(uint8_t *rx_data, size_t rx_len);
 *************************/
 
 // Enable I2C0 peripheral - setting to false will disable (not initialized at boot)
-#define HW_USE_I2C0 true
+#define HW_USE_I2C0 false
 
 // I2C0 Settings
 #define I2C0_ID            i2c0
@@ -841,7 +841,7 @@ flash_usage_t onboard_flash_usage(void);
 **************************************/
 
 // Enable ADC peripheral - setting to false will disable all ADCs (not initialized at boot)
-#define HW_USE_ADC true
+#define HW_USE_ADC false
 
 // ADC channel settings
 #define ADC0_GPIO 26 // this is ADC0

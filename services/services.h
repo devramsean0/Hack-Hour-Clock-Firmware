@@ -222,7 +222,6 @@ static const ServiceFunc_t service_functions[] = {
     usb_service,
     storman_service,
     watchdog_service,
-    heartbeat_service,
     segment_service
 };
 
@@ -236,7 +235,6 @@ static const char *service_strings[] = {
     xstr(SERVICE_NAME_USB),
     xstr(SERVICE_NAME_STORMAN),
     xstr(SERVICE_NAME_WATCHDOG),
-    xstr(SERVICE_NAME_HEARTBEAT),
     xstr(SERVICE_NAME_SEGMENT)
 };
 
