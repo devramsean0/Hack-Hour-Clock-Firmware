@@ -26,6 +26,12 @@
 #include "queue.h"
 #include "device_drivers.h"
 
+#define KILOBIT   0XFE //KiloBit
+#define HUNDREDS  0XFD //hundreds
+#define TENS      0XFB //tens
+#define UNITS     0XF7 //units
+#define Dot       0x80 //decimal separator
+
 UBYTE SEG8Code[] ={
         0x3F, // 0
         0x06, // 1
@@ -59,10 +65,10 @@ BaseType_t segment_service(void)
 
     xReturn = xTaskCreate(
         prvSegmentTask,             // main function of this service, defined below
-        xstr(SERVICE_NAME_HEARTBEAT), // name defined in services.h
-        STACK_HEARTBEAT,              // stack size defined in services.h
+        xstr(SERVICE_NAME_SEGMENT), // name defined in services.h
+        STACK_SEGMENT,              // stack size defined in services.h
         NULL,                         // parameters passed to created task (not used)
-        PRIORITY_HEARTBEAT,           // priority of this service, defined in services.h
+        PRIORITY_SEGMENT,           // priority of this service, defined in services.h
         &xSegmentTask               // FreeRTOS task handle
     );
 
@@ -85,20 +91,19 @@ static void prvSegmentTask(void *pvParameters)
     //
     static char *segment_string = "ba-bump";
     printf("Before Logs");
-    pico_8seg_led_init();
-    printf("Passed Init");
+    if (pico_8seg_led_init()) {
+        cli_print_timestamped("Initialized");
+    };
     while(true) {
         //
         // Main service (run continuous) code can be placed here
         // (similar to Arduino loop(), if that's your thing)
         //
-        pico_8seg_led_send_command(TENS, SEG8Code[1]);
-        printf("Hello!");
-        // always include the below, with REPEAT & DELAY settings in services.h,
+        pico_8seg_led_send_command(UNITS, SEG8Code[1]);        // always include the below, with REPEAT & DELAY settings in services.h,
         // otherwise the service will starve out other RTOS tasks
 
         // update this task's schedule
-        task_sched_update(REPEAT_HEARTBEAT, DELAY_HEARTBEAT);
+        task_sched_update(REPEAT_SEGMENT, DELAY_SEGMENT);
     }
 
     // the task runs forever unless the RTOS kernel suspends or kills it.

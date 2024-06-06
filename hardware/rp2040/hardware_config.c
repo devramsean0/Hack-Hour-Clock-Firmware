@@ -99,6 +99,6 @@ void hardware_init(void) {
         onboard_flash_init();
         uart_puts(UART_ID_CLI, "flash ");
     }
-
+    stdio_init_all();
     uart_puts(UART_ID_CLI, "}\r\n");
 }

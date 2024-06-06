@@ -4,7 +4,7 @@
 #include "hardware_config.h"
 #include "utils.h"
 
-#define SPI_PORT spi0
+#define SPI_PORT spi1
 int LED_8SEG_RCLK_PIN;
 int LED_8SEG_CLK_PIN;
 int LED_8SEG_MOSI_PIN;
@@ -22,6 +22,10 @@ int pico_8seg_led_init(void) {
     // GPIO Config
     GPIO_MODE(LED_8SEG_RCLK_PIN, 1);
     gpio_put(LED_8SEG_RCLK_PIN, 1);
+    if (spi_get_hw(SPI_PORT) == NULL) {
+        return 0;
+    }
+    pico_8seg_led_send_command(0X57, 0x35);
     return 1;
 }
 
