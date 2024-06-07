@@ -8,6 +8,9 @@
 #define UWORD   uint16_t
 #define UDOUBLE uint32_t
 
+#define str(s) # s
+#define xstr(s) str(s)
+
 // SPI Defines
 // We are going to use SPI 0, and allocate it to the following GPIO pins
 // Pins can be changed, see the GPIO function select table in the datasheet for information on GPIO assignments
@@ -76,9 +79,8 @@ int main()
 
     // Initialise the Wi-Fi chip
     printf("Connecting to Wi-Fi...\n");
-    if (cyw43_arch_wifi_connect_timeout_ms(WIFI_SSID, WIFI_PASS, CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+    if (cyw43_arch_wifi_connect_timeout_ms(xstr(WIFI_SSID), xstr(WIFI_PASS), CYW43_AUTH_WPA2_AES_PSK, 30000)) {
         printf("failed to connect.\n");
-        return 1;
     } else {
         printf("Connected.\n");
     }
@@ -90,7 +92,6 @@ int main()
     }
 
     // Enable wifi station
-    cyw43_arch_enable_sta_mode();
 
     /* printf("Connecting to Wi-Fi...\n");
     if (cyw43_arch_wifi_connect_timeout_ms("Your Wi-Fi SSID", "Your Wi-Fi Password", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
