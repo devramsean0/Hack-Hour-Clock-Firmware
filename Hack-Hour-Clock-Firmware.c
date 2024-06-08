@@ -1,3 +1,8 @@
+// Delay usb connection indefinitely
+#ifndef PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS
+#define PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS (-1)
+#endif
+
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
@@ -75,15 +80,22 @@ int init_8seg_led() {
 
 int main()
 {
+    _Bool result = stdio_usb_init();
     stdio_init_all();
+    bool WIFI_CONNECTED = false;
 
     // Initialise the Wi-Fi chip
     printf("Connecting to Wi-Fi...\n");
-    if (cyw43_arch_wifi_connect_timeout_ms(xstr(WIFI_SSID), xstr(WIFI_PASS), CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+    cyw43_arch_init();
+    if (cyw43_arch_wifi_connect_timeout_ms("Gigaclear_C479", "x1izzxbnct", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
         printf("failed to connect.\n");
     } else {
+        uint8_t *ip_address = (uint8_t*)&(cyw43_state.netif[0].ip_addr.addr);
+        printf("IP address %d.%d.%d.%d\n", ip_address[0], ip_address[1], ip_address[2], ip_address[3]);
         printf("Connected.\n");
+        WIFI_CONNECTED = true;
     }
+    cyw43_arch_enable_sta_mode();
 
     if (init_8seg_led()) {
         printf("8-segment LED init success");
@@ -105,6 +117,10 @@ int main()
     } */
 
     while (true) {
-        led_send_command(0X57, SEG8Code[0]);
+        if (WIFI_CONNECTED) {
+            led_send_command(KILOBIT, SEG8Code[1]);
+        } else {
+            led_send_command(KILOBIT, SEG8Code[0]);
+        }
     }
 }
